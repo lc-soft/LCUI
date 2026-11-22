@@ -22,8 +22,16 @@ for _, topic in ipairs(previews) do
         add_deps("lcui")
 end
 
-target("preview-flex-layout-percentage-wrap")
+target("preview-textinput-edit")
     set_default(false)
+    set_kind("binary")
+    set_group("previews")
+    set_rundir("../fixtures")
+    add_includedirs("../helpers")
+    add_files("preview_textinput_edit.c")
+    add_deps("lcui")
+
+target("preview-flex-layout-percentage-wrap")    set_default(false)
     set_kind("binary")
     set_group("previews")
     set_rundir("../fixtures")

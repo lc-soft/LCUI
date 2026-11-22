@@ -195,8 +195,16 @@ static const struct {
         { "  background-color: rgba(96, 165, 250, 0.15);\n", 46 },
         { "  color: rgba(96, 165, 250, 1);\n", 32 },
         { "}\n", 2 },
+        { ".accent-blue textinput .selection {\n", 36 },
+        { "  background-color: rgba(37, 99, 235, 1);\n", 42 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
+        { ".accent-blue.dark textinput .selection {\n", 41 },
+        { "  background-color: rgba(96, 165, 250, 1);\n", 43 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
 };
-static const size_t css_str_blue_total_length = 5375;
+static const size_t css_str_blue_total_length = 5607;
 static inline void ui_load_css_string_blue_chunks(void)
 {
         size_t i;

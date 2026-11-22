@@ -199,8 +199,16 @@ static const struct {
         { "  background-color: rgba(251, 146, 60, 0.15);\n", 46 },
         { "  color: rgba(251, 146, 60, 1);\n", 32 },
         { "}\n", 2 },
+        { ".accent-orange textinput .selection {\n", 38 },
+        { "  background-color: rgba(234, 88, 12, 1);\n", 42 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
+        { ".accent-orange.dark textinput .selection {\n", 43 },
+        { "  background-color: rgba(251, 146, 60, 1);\n", 43 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
 };
-static const size_t css_str_orange_total_length = 5495;
+static const size_t css_str_orange_total_length = 5731;
 static inline void ui_load_css_string_orange_chunks(void)
 {
         size_t i;

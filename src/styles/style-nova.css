@@ -1657,6 +1657,20 @@ textinput {
   box-sizing: border-box;
 }
 
+/* textcaret: structural rules live in src/widgets/textcaret.c; its color
+ * follows the theme foreground so it stays visible on every background. */
+textcaret {
+  @apply bg-foreground dark:bg-foreground-dark;
+}
+
+/* textinput selection: solid accent background with its foreground color.
+ * The widget renders this hidden element's computed style over the selection
+ * range and draws the selected glyphs again in the foreground color. */
+textinput .selection {
+  @apply bg-primary text-primary-foreground;
+  @apply dark:bg-primary-dark dark:text-primary-foreground-dark;
+}
+
 textinput:focus {
   @apply border-foreground dark:border-foreground-dark;
   box-shadow: theme("boxShadow.focus");

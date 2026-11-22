@@ -195,8 +195,16 @@ static const struct {
         { "  background-color: rgba(163, 230, 53, 0.15);\n", 46 },
         { "  color: rgba(163, 230, 53, 1);\n", 32 },
         { "}\n", 2 },
+        { ".accent-lime textinput .selection {\n", 36 },
+        { "  background-color: rgba(101, 163, 13, 1);\n", 43 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
+        { ".accent-lime.dark textinput .selection {\n", 41 },
+        { "  background-color: rgba(163, 230, 53, 1);\n", 43 },
+        { "  color: rgba(23, 23, 23, 1);\n", 30 },
+        { "}\n", 2 },
 };
-static const size_t css_str_lime_total_length = 5369;
+static const size_t css_str_lime_total_length = 5599;
 static inline void ui_load_css_string_lime_chunks(void)
 {
         size_t i;

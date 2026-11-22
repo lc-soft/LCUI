@@ -2311,6 +2311,12 @@ static const struct {
         { "textinput {\r\n", 13 },
         { "  box-sizing: border-box;\n", 26 },
         { "}\n", 2 },
+        { "textcaret {\r\n", 13 },
+        { "  background-color: #0a0a0a;\n", 29 },
+        { "}\n", 2 },
+        { ".dark textcaret {\r\n", 19 },
+        { "  background-color: #fafafa;\n", 29 },
+        { "}\n", 2 },
         { "textinput:focus {\r\n", 19 },
         { "  border-color: #0a0a0a;\n", 25 },
         { "}\n", 2 },
@@ -2521,8 +2527,16 @@ static const struct {
         { ".dark scrollbar-thumb:active {\r\n", 32 },
         { "  background-color: rgb(250 250 250 / 0.6);\n", 44 },
         { "}\n", 2 },
+        { "textinput .selection {\r\n", 24 },
+        { "  background-color: #171717;\r\n", 30 },
+        { "  color: #fafafa;\n", 18 },
+        { "}\n", 2 },
+        { ".dark textinput .selection {\r\n", 30 },
+        { "  background-color: #fafafa;\r\n", 30 },
+        { "  color: #171717;\n", 18 },
+        { "}\n", 2 },
 };
-static const size_t css_str_style_nova_total_length = 50776;
+static const size_t css_str_style_nova_total_length = 51024;
 static inline void ui_load_css_string_style_nova_chunks(void)
 {
         size_t i;

@@ -606,6 +606,35 @@ static void check_link_button_has_no_background_in_dark(void)
         ui_clear_trash();
 }
 
+static void check_textcaret_follows_theme_foreground(void)
+{
+        ui_widget_t *input = ui_create_widget("textinput");
+        ui_widget_t *caret;
+
+        ui_widget_append(ui_root(), input);
+        ui_update();
+        caret = ui_widget_get_child(input, 0);
+        ctest_equal_bool("light caret should match the text foreground",
+                         caret->computed_style.background_color ==
+                             input->computed_style.color,
+                         true);
+        ctest_equal_bool(
+            "light caret should not use the old black color",
+            caret->computed_style.background_color != css_color(255, 0, 0, 0),
+            true);
+
+        ui_widget_add_class(ui_root(), "dark");
+        ui_update();
+        ctest_equal_bool("dark caret should match the text foreground",
+                         caret->computed_style.background_color ==
+                             input->computed_style.color,
+                         true);
+
+        ui_widget_remove_class(ui_root(), "dark");
+        ui_widget_destroy(input);
+        ui_clear_trash();
+}
+
 void test_style_nova(void)
 {
         lcui_init();
@@ -636,6 +665,7 @@ void test_style_nova(void)
         ctest_describe("style-nova: toast", check_toast_theme);
         ctest_describe("style-nova: card", check_card_theme);
         ctest_describe("style-nova: attachment", check_attachment_theme);
-
+        ctest_describe("style-nova: textcaret",
+                       check_textcaret_follows_theme_foreground);
         lcui_destroy();
 }

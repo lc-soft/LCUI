@@ -193,8 +193,16 @@ static const struct {
         { "  background-color: rgba(56, 189, 248, 0.15);\n", 46 },
         { "  color: rgba(56, 189, 248, 1);\n", 32 },
         { "}\n", 2 },
+        { ".accent-sky textinput .selection {\n", 35 },
+        { "  background-color: rgba(2, 132, 199, 1);\n", 42 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
+        { ".accent-sky.dark textinput .selection {\n", 40 },
+        { "  background-color: rgba(56, 189, 248, 1);\n", 43 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
 };
-static const size_t css_str_sky_total_length = 5315;
+static const size_t css_str_sky_total_length = 5545;
 static inline void ui_load_css_string_sky_chunks(void)
 {
         size_t i;

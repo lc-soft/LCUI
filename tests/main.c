@@ -24,6 +24,7 @@ extern void test_css_unload(void);
 extern void test_text_resize(void);
 extern void test_text_decoration(void);
 extern void test_textinput(void);
+extern void test_textinput_edit(void);
 extern void test_font_face(void);
 extern void test_widget_opacity(void);
 extern void test_widget_status(void);
@@ -93,6 +94,7 @@ static const ctest_suite_t suites[] = {
         { "text resize", test_text_resize },
         { "text decoration", test_text_decoration },
         { "textinput", test_textinput },
+        { "textinput edit", test_textinput_edit },
         { "font face", test_font_face },
         { "widget opacity", test_widget_opacity },
         { "widget status", test_widget_status },

@@ -349,6 +349,43 @@ int pd_text_get_line_length(pd_text_t *text, int line_num)
         return text->lines[line_num]->length;
 }
 
+static int pd_text_eol_length(pd_text_eol_t eol)
+{
+        switch (eol) {
+        case PD_TEXT_EOL_CR:
+        case PD_TEXT_EOL_LF:
+                return 1;
+        case PD_TEXT_EOL_CR_LF:
+                return 2;
+        case PD_TEXT_EOL_NONE:
+        default:
+                break;
+        }
+        return 0;
+}
+
+pd_text_eol_t pd_text_get_line_eol(pd_text_t *text, int line_num)
+{
+        if (line_num < 0 || line_num >= text->lines_length) {
+                return PD_TEXT_EOL_NONE;
+        }
+        return text->lines[line_num]->eol;
+}
+
+int pd_text_get_line_char_start(pd_text_t *text, int line_num)
+{
+        int i, start = 0;
+
+        if (line_num < 0 || line_num >= text->lines_length) {
+                return -1;
+        }
+        for (i = 0; i < line_num; ++i) {
+                start += text->lines[i]->length +
+                         pd_text_eol_length(text->lines[i]->eol);
+        }
+        return start;
+}
+
 void pd_text_request_typeset(pd_text_t *text, int start_line)
 {
         if (start_line < text->task.typeset_start_line) {
@@ -364,7 +401,7 @@ int pd_text_get_line_rect(pd_text_t *text, int line_num, int start_col,
         int i;
         pd_text_line_t *line;
 
-        if (line_num >= text->lines_length) {
+        if (line_num < 0 || line_num >= text->lines_length) {
                 return -1;
         }
         /* 先计算在有效区域内的起始行的y轴坐标 */
@@ -374,6 +411,14 @@ int pd_text_get_line_rect(pd_text_t *text, int line_num, int start_col,
                 rect->y += text->lines[i]->height;
         }
         line = text->lines[line_num];
+        if (start_col < 0) {
+                start_col = 0;
+        } else if (start_col > line->length) {
+                start_col = line->length;
+        }
+        if (end_col < start_col) {
+                end_col = start_col - 1;
+        }
         if (end_col < 0 || end_col >= line->length) {
                 end_col = line->length - 1;
         }
@@ -383,7 +428,7 @@ int pd_text_get_line_rect(pd_text_t *text, int line_num, int start_col,
                 rect->width = line->width;
         } else {
                 for (i = 0; i < start_col; ++i) {
-                        if (!line->string[i]->bitmap) {
+                        if (!line->string[i] || !line->string[i]->bitmap) {
                                 continue;
                         }
                         rect->x +=
@@ -391,7 +436,7 @@ int pd_text_get_line_rect(pd_text_t *text, int line_num, int start_col,
                 }
                 rect->width = 0;
                 for (i = start_col; i <= end_col && i < line->length; ++i) {
-                        if (!line->string[i]->bitmap) {
+                        if (!line->string[i] || !line->string[i]->bitmap) {
                                 continue;
                         }
                         rect->width +=

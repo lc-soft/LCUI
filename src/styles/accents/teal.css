@@ -238,6 +238,22 @@
   color: rgba(23, 23, 23, 1);
 }
 
+.accent-teal textinput .selection {
+  background-color: rgba(13, 148, 136, 1);
+}
+
+.accent-teal textinput .selection {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-teal.dark textinput .selection {
+  background-color: rgba(45, 212, 191, 1);
+}
+
+.accent-teal.dark textinput .selection {
+  color: rgba(23, 23, 23, 1);
+}
+
 .accent-teal .sidebar-menu-button:hover {
   background-color: rgba(13, 148, 136, 0.1);
 }

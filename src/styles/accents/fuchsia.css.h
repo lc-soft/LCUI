@@ -199,8 +199,16 @@ static const struct {
         { "  background-color: rgba(232, 121, 249, 0.15);\n", 47 },
         { "  color: rgba(232, 121, 249, 1);\n", 33 },
         { "}\n", 2 },
+        { ".accent-fuchsia textinput .selection {\n", 39 },
+        { "  background-color: rgba(192, 38, 211, 1);\n", 43 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
+        { ".accent-fuchsia.dark textinput .selection {\n", 44 },
+        { "  background-color: rgba(232, 121, 249, 1);\n", 44 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
 };
-static const size_t css_str_fuchsia_total_length = 5609;
+static const size_t css_str_fuchsia_total_length = 5849;
 static inline void ui_load_css_string_fuchsia_chunks(void)
 {
         size_t i;

@@ -285,54 +285,61 @@ int pd_text_write(pd_text_t *text, const wchar_t *wstr, list_t *tag_stack)
 size_t pd_text_read(pd_text_t *text, size_t start_pos, size_t max_len,
                     wchar_t *wstr_buff)
 {
-        size_t i, line_num, col;
+        size_t i, out = 0;
+        int col, line_num;
         pd_text_line_t *line;
 
         if (max_len == 0) {
                 wstr_buff[0] = 0;
                 return 0;
         }
-        /* 先根据一维坐标计算行列坐标 */
-        for (i = 0, line_num = 0, col = 0; line_num < text->lines_length;
-             ++line_num) {
-                if (i >= start_pos) {
-                        col = start_pos - i;
-                        break;
-                }
-                i += text->lines[line_num]->length;
-        }
-        for (i = 0; line_num < text->lines_length && i < max_len; ++line_num) {
+        /* 一维坐标包含行尾换行符，与编辑器内核的字符索引保持一致 */
+        for (i = 0, line_num = 0; line_num < text->lines_length; ++line_num) {
                 line = text->lines[line_num];
-                for (; col < line->length && i < max_len; ++col, ++i) {
-                        wstr_buff[i] = line->string[col]->code;
+                for (col = 0; col < line->length && out < max_len; ++col) {
+                        if (i >= start_pos) {
+                                wstr_buff[out++] = line->string[col]->code;
+                        }
+                        ++i;
                 }
-                /* 进入下一行前，按行尾符还原对应的换行字符 */
-                if (i >= max_len) {
+                if (out >= max_len) {
                         break;
                 }
                 switch (line->eol) {
                 case PD_TEXT_EOL_CR:
-                        wstr_buff[i++] = L'\r';
+                        if (i >= start_pos) {
+                                wstr_buff[out++] = L'\r';
+                        }
+                        ++i;
                         break;
                 case PD_TEXT_EOL_LF:
-                        wstr_buff[i++] = L'\n';
+                        if (i >= start_pos) {
+                                wstr_buff[out++] = L'\n';
+                        }
+                        ++i;
                         break;
                 case PD_TEXT_EOL_CR_LF:
-                        wstr_buff[i++] = L'\r';
-                        if (i >= max_len) {
-                                break;
+                        if (i >= start_pos) {
+                                wstr_buff[out++] = L'\r';
                         }
-                        wstr_buff[i++] = L'\n';
+                        ++i;
+                        if (out < max_len) {
+                                if (i >= start_pos) {
+                                        wstr_buff[out++] = L'\n';
+                                }
+                                ++i;
+                        }
                         break;
                 case PD_TEXT_EOL_NONE:
                 default:
                         break;
                 }
-                /* 切换到下一行时必须重置列号 */
-                col = 0;
+                if (out >= max_len) {
+                        break;
+                }
         }
-        wstr_buff[i] = 0;
-        return i;
+        wstr_buff[out] = 0;
+        return out;
 }
 
 wchar_t *pd_text_to_wcs(pd_text_t *text)

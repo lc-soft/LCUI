@@ -195,8 +195,16 @@ static const struct {
         { "  background-color: rgba(251, 113, 133, 0.15);\n", 47 },
         { "  color: rgba(251, 113, 133, 1);\n", 33 },
         { "}\n", 2 },
+        { ".accent-rose textinput .selection {\n", 36 },
+        { "  background-color: rgba(225, 29, 72, 1);\n", 42 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
+        { ".accent-rose.dark textinput .selection {\n", 41 },
+        { "  background-color: rgba(251, 113, 133, 1);\n", 44 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
 };
-static const size_t css_str_rose_total_length = 5402;
+static const size_t css_str_rose_total_length = 5635;
 static inline void ui_load_css_string_rose_chunks(void)
 {
         size_t i;

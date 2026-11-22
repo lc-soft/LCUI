@@ -38,7 +38,6 @@ textcaret {\
 	width: 1px;\
 	height: 14px;\
 	position: absolute;\
-	background-color: #000;\
 }";
 
 void ui_textcaret_refresh(ui_widget_t *widget)

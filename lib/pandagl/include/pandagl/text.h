@@ -142,6 +142,15 @@ PD_PUBLIC int pd_text_get_line_height(pd_text_t *layer, int line_num);
 /** 获取指定文本行的文本长度 */
 PD_PUBLIC int pd_text_get_line_length(pd_text_t *layer, int line_num);
 
+/** 获取指定视觉行的行尾类型（越界返回 PD_TEXT_EOL_NONE） */
+PD_PUBLIC pd_text_eol_t pd_text_get_line_eol(pd_text_t *layer, int line_num);
+
+/**
+ * 获取指定视觉行首字符在扁平文本中的索引（包含前序硬换行的字符数）。
+ * 软换行不消耗字符，越界返回 -1。
+ */
+PD_PUBLIC int pd_text_get_line_char_start(pd_text_t *layer, int line_num);
+
 /** 添加 更新文本排版 的任务 */
 PD_PUBLIC void pd_text_request_typeset(pd_text_t *layer, int start_row);
 
@@ -170,6 +179,14 @@ PD_PUBLIC int pd_text_get_char_pixel(pd_text_t *layer, int line_num, int col,
 
 /** 获取文本光标的像素坐标 */
 PD_PUBLIC int pd_text_get_caret_pixel(pd_text_t *layer, pd_pos_t *pixel_pos);
+
+/**
+ * 获取视觉行中 [start_col, end_col] 字符范围的矩形（实际像素坐标，
+ * 包含 offset 与对齐偏移）。返回 0 表示有效区域。
+ */
+PD_PUBLIC int pd_text_get_line_rect(pd_text_t *layer, int line_num,
+                                    int start_col, int end_col,
+                                    pd_rect_t *rect);
 
 /** 清空文本 */
 PD_PUBLIC void pd_text_clear(pd_text_t *layer);

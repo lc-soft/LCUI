@@ -199,8 +199,16 @@ static const struct {
         { "  background-color: rgba(129, 140, 248, 0.15);\n", 47 },
         { "  color: rgba(129, 140, 248, 1);\n", 33 },
         { "}\n", 2 },
+        { ".accent-indigo textinput .selection {\n", 38 },
+        { "  background-color: rgba(79, 70, 229, 1);\n", 42 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
+        { ".accent-indigo.dark textinput .selection {\n", 43 },
+        { "  background-color: rgba(129, 140, 248, 1);\n", 44 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
 };
-static const size_t css_str_indigo_total_length = 5522;
+static const size_t css_str_indigo_total_length = 5759;
 static inline void ui_load_css_string_indigo_chunks(void)
 {
         size_t i;

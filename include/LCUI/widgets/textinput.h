@@ -31,28 +31,43 @@
 
 LCUI_BEGIN_HEADER
 
-/** Enable style tag parser  */
+/** Enable the style tag parser (read-only display only; ignored while editable)
+ */
 LCUI_API void ui_textinput_enable_style_tag(ui_widget_t *widget, bool enable);
 
 LCUI_API void ui_textinput_enable_multiline(ui_widget_t *widget, bool enable);
+
+/** 设置只读状态：仍可移动光标和选择/复制，但不能修改文本 */
+LCUI_API void ui_textinput_set_read_only(ui_widget_t *widget, bool read_only);
+
+/** 设置选区背景色（支持 rgba；默认实色 primary） */
+LCUI_API void ui_textinput_set_selection_color(ui_widget_t *widget,
+                                               pd_color_t color);
+
+/** 设置选区文字颜色（默认 primary-foreground） */
+LCUI_API void ui_textinput_set_selection_text_color(ui_widget_t *widget,
+                                                    pd_color_t color);
 
 LCUI_API void ui_textinput_move_caret(ui_widget_t *widget, int row, int col);
 
 /** 清空文本内容 */
 LCUI_API void ui_textinput_clear_text(ui_widget_t *widget);
 
-/** 获取文本内容 */
+/**
+ * 获取文本内容。start 是包含换行符的扁平字符索引；
+ * 文本写入时 CRLF / CR 已归一化为 LF。
+ */
 LCUI_API size_t ui_textinput_get_text_w(ui_widget_t *w, size_t start,
                                         size_t max_len, wchar_t *buf);
 
-/** 获取文本长度 */
+/** 获取文本长度（CRLF 已归一化） */
 LCUI_API size_t ui_textinput_get_text_length(ui_widget_t *w);
 
 /** 设置文本编辑框内的光标，指定是否闪烁、闪烁时间间隔 */
 LCUI_API void ui_textinput_set_caret_blink(ui_widget_t *w, bool visible,
                                            int time);
 
-/** 为文本框设置文本（宽字符版） */
+/** 为文本框设置文本（宽字符版）；CRLF / CR 会归一化为 LF */
 LCUI_API int ui_textinput_set_text_w(ui_widget_t *widget, const wchar_t *wstr);
 
 LCUI_API int ui_textinput_set_text(ui_widget_t *widget, const char *utf8_str);

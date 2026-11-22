@@ -193,8 +193,16 @@ static const struct {
         { "  background-color: rgba(248, 113, 113, 0.15);\n", 47 },
         { "  color: rgba(248, 113, 113, 1);\n", 33 },
         { "}\n", 2 },
+        { ".accent-red textinput .selection {\n", 35 },
+        { "  background-color: rgba(220, 38, 38, 1);\n", 42 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
+        { ".accent-red.dark textinput .selection {\n", 40 },
+        { "  background-color: rgba(248, 113, 113, 1);\n", 44 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
 };
-static const size_t css_str_red_total_length = 5342;
+static const size_t css_str_red_total_length = 5573;
 static inline void ui_load_css_string_red_chunks(void)
 {
         size_t i;

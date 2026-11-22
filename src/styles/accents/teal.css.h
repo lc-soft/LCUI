@@ -195,8 +195,16 @@ static const struct {
         { "  background-color: rgba(45, 212, 191, 0.15);\n", 46 },
         { "  color: rgba(45, 212, 191, 1);\n", 32 },
         { "}\n", 2 },
+        { ".accent-teal textinput .selection {\n", 36 },
+        { "  background-color: rgba(13, 148, 136, 1);\n", 43 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
+        { ".accent-teal.dark textinput .selection {\n", 41 },
+        { "  background-color: rgba(45, 212, 191, 1);\n", 43 },
+        { "  color: rgba(23, 23, 23, 1);\n", 30 },
+        { "}\n", 2 },
 };
-static const size_t css_str_teal_total_length = 5369;
+static const size_t css_str_teal_total_length = 5599;
 static inline void ui_load_css_string_teal_chunks(void)
 {
         size_t i;

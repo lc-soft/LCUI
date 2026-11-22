@@ -238,6 +238,22 @@
   color: rgba(250, 250, 250, 1);
 }
 
+.accent-fuchsia textinput .selection {
+  background-color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia textinput .selection {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia.dark textinput .selection {
+  background-color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia.dark textinput .selection {
+  color: rgba(250, 250, 250, 1);
+}
+
 .accent-fuchsia .sidebar-menu-button:hover {
   background-color: rgba(192, 38, 211, 0.1);
 }

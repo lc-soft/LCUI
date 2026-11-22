@@ -199,8 +199,16 @@ static const struct {
         { "  background-color: rgba(52, 211, 153, 0.15);\n", 46 },
         { "  color: rgba(52, 211, 153, 1);\n", 32 },
         { "}\n", 2 },
+        { ".accent-emerald textinput .selection {\n", 39 },
+        { "  background-color: rgba(5, 150, 105, 1);\n", 42 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
+        { ".accent-emerald.dark textinput .selection {\n", 44 },
+        { "  background-color: rgba(52, 211, 153, 1);\n", 43 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
 };
-static const size_t css_str_emerald_total_length = 5555;
+static const size_t css_str_emerald_total_length = 5793;
 static inline void ui_load_css_string_emerald_chunks(void)
 {
         size_t i;

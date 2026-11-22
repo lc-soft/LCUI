@@ -195,8 +195,16 @@ static const struct {
         { "  background-color: rgba(244, 114, 182, 0.15);\n", 47 },
         { "  color: rgba(244, 114, 182, 1);\n", 33 },
         { "}\n", 2 },
+        { ".accent-pink textinput .selection {\n", 36 },
+        { "  background-color: rgba(219, 39, 119, 1);\n", 43 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
+        { ".accent-pink.dark textinput .selection {\n", 41 },
+        { "  background-color: rgba(244, 114, 182, 1);\n", 44 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
 };
-static const size_t css_str_pink_total_length = 5429;
+static const size_t css_str_pink_total_length = 5663;
 static inline void ui_load_css_string_pink_chunks(void)
 {
         size_t i;

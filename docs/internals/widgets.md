@@ -528,3 +528,31 @@ ui_mutation_observer_observe(observer, w, options);        /* 观察自身 */
 `ui_widget_add_mutation_record`），所以观察自身同样收到整个子树的变更；而自身在 destroy 回调
 里仍然有效，无悬挂指针。scrollarea / combobox 也是观察自身。
 
+
+## textinput 编辑内核（stb_textedit）
+
+`textinput` 的编辑状态由 `src/widgets/textedit.c` 封装 `stb_textedit.h` v1.16：
+
+- canonical 文本是唯一事实来源（`wchar_t`，`\r\n`/`\r` 归一化为 `\n`）；
+- `pd_text` 只是投影：每次编辑后 `pd_text_clear + pd_text_append` 重建，再
+  `pd_text_update`，保证 stb 的后续布局查询看到最新行结构；
+- 索引映射：软换行不消耗字符，硬换行（`eol != PD_TEXT_EOL_NONE`）消耗 1 个字符；
+  视觉行信息来自 `pd_text_get_line_eol` / `pd_text_get_line_char_start`；
+- `ui_textinput_update_caret` 必须使用文本层缓存的 `layer_scale`，不能用事件期的
+  `ui_get_actual_scale()`（事件分发发生在 `ui_server_update()` 之外，全局 dpi 可能
+  仍是默认值）；
+- 选区由 textinput 在 `on_paint` 中先于 `pd_text_render_to` 绘制；
+- 选区颜色默认是实色 `primary`，文字用 `primary-foreground`（亮色主题白字、
+  暗色主题深字）；可用 `selection-color` / `selection-text-color` 属性或
+  `ui_textinput_set_selection_color()` / `ui_textinput_set_selection_text_color()`；
+  也支持 CSS 规则 `textinput .selection { background-color: ...; color: ...; }`。
+  textinput 内部维护一个 0×0、绝对定位的 `.selection` 隐藏子部件，只用于承载
+  这些样式，绘制时读取它的 computed `background-color` / `color`。属性/API 会写入
+  该元素的 inline 样式，优先级高于 CSS 规则；两者都没有时回退到默认值；
+- 编辑场景不支持样式标签（canonical 索引会被 pd_text 消费）；Windows 下通过
+  `GETPREV/NEXTCHARINDEX` 跳过 UTF-16 代理对；
+- 当前重建是 O(N)，定位为表单级文本（KB 级）；GB 级文档需要 rope/piece table +
+  虚拟化排版，不能沿用该实现。
+
+测试：`tests/integration/test_textinput.c`、`test_textinput_edit.c`；
+可视诊断：`tests/previews/preview_textinput_edit.c`。

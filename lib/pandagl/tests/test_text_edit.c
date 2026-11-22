@@ -207,6 +207,41 @@ static void should_dump_respect_max_len(void)
         pd_text_destroy(text);
 }
 
+static void should_dump_from_multiline_offset(void)
+{
+        pd_text_t *text = pd_text_create();
+        wchar_t buf[16];
+
+        pd_text_set_multiline(text, true);
+        pd_text_write(text, L"abc\ndef", NULL);
+        /* 一维索引包含换行符：0..2=abc, 3=\n, 4..6=def */
+        ctest_equal_uint("should read from the second line",
+                         (unsigned)pd_text_read(text, 4, 16, buf), 3u);
+        ctest_equal_wcs("should return the second line text", buf, L"def");
+        ctest_equal_uint("should read starting at the newline",
+                         (unsigned)pd_text_read(text, 3, 16, buf), 4u);
+        ctest_equal_wcs("should include the newline", buf, L"\ndef");
+        pd_text_destroy(text);
+}
+
+static void should_report_line_char_start(void)
+{
+        pd_text_t *text = pd_text_create();
+
+        pd_text_set_multiline(text, true);
+        pd_text_write(text, L"abc\ndef", NULL);
+        ctest_equal_int("line 0 should start at 0",
+                        pd_text_get_line_char_start(text, 0), 0);
+        ctest_equal_int("line 1 should follow the newline",
+                        pd_text_get_line_char_start(text, 1), 4);
+        ctest_equal_bool("line 0 eol is LF",
+                         pd_text_get_line_eol(text, 0) == PD_TEXT_EOL_LF, true);
+        ctest_equal_bool("line 1 eol is none",
+                         pd_text_get_line_eol(text, 1) == PD_TEXT_EOL_NONE,
+                         true);
+        pd_text_destroy(text);
+}
+
 static void should_to_wcs_return_full_text(void)
 {
         pd_text_t *text = pd_text_create();
@@ -346,6 +381,9 @@ void test_pandagl_text_edit(void)
         ctest_describe("text dump trailing newline",
                        should_dump_multiline_with_trailing_newline);
         ctest_describe("text dump max len", should_dump_respect_max_len);
+        ctest_describe("text dump multiline offset",
+                       should_dump_from_multiline_offset);
+        ctest_describe("text line char start", should_report_line_char_start);
         ctest_describe("text to_wcs full text", should_to_wcs_return_full_text);
         ctest_describe("text to_wcs empty", should_to_wcs_handle_empty_text);
         ctest_describe("text escape open bracket", should_escape_open_bracket);

@@ -238,6 +238,22 @@
   color: rgba(250, 250, 250, 1);
 }
 
+.accent-blue textinput .selection {
+  background-color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue textinput .selection {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue.dark textinput .selection {
+  background-color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue.dark textinput .selection {
+  color: rgba(250, 250, 250, 1);
+}
+
 .accent-blue .sidebar-menu-button:hover {
   background-color: rgba(37, 99, 235, 0.1);
 }

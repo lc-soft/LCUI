@@ -197,8 +197,16 @@ static const struct {
         { "  background-color: rgba(251, 191, 36, 0.15);\n", 46 },
         { "  color: rgba(251, 191, 36, 1);\n", 32 },
         { "}\n", 2 },
+        { ".accent-amber textinput .selection {\n", 37 },
+        { "  background-color: rgba(217, 119, 6, 1);\n", 42 },
+        { "  color: rgba(250, 250, 250, 1);\n", 33 },
+        { "}\n", 2 },
+        { ".accent-amber.dark textinput .selection {\n", 42 },
+        { "  background-color: rgba(251, 191, 36, 1);\n", 43 },
+        { "  color: rgba(23, 23, 23, 1);\n", 30 },
+        { "}\n", 2 },
 };
-static const size_t css_str_amber_total_length = 5402;
+static const size_t css_str_amber_total_length = 5633;
 static inline void ui_load_css_string_amber_chunks(void)
 {
         size_t i;

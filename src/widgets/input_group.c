@@ -212,11 +212,15 @@ static bool ui_input_group_is_button(ui_widget_t *target, ui_widget_t *stop)
 static void ui_input_group_on_focus(ui_widget_t *w, ui_event_t *e, void *arg)
 {
         ui_widget_add_status(w, "focused");
+        ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_GRAPH_BOX);
+        ui_widget_request_update(w);
 }
 
 static void ui_input_group_on_blur(ui_widget_t *w, ui_event_t *e, void *arg)
 {
         ui_widget_remove_status(w, "focused");
+        ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_GRAPH_BOX);
+        ui_widget_request_update(w);
 }
 
 static void ui_input_group_on_disabled(ui_widget_t *w, ui_event_t *e, void *arg)
