@@ -1547,6 +1547,17 @@ static const struct {
         { "  border: 0;\r\n", 14 },
         { "  box-shadow: none;\n", 20 },
         { "}\n", 2 },
+        { "\n", 1 },
+        { "input-group textinput.input-group-input:focus,\r\n", 48 },
+        { "input-group textinput.input-group-textarea:focus {\r\n", 52 },
+        { "  border: 0;\r\n", 14 },
+        { "  box-shadow: none;\n", 20 },
+        { "}\n", 2 },
+        { ".dark input-group textinput.input-group-input:focus,\r\n", 54 },
+        { ".dark input-group textinput.input-group-textarea:focus {\r\n", 58 },
+        { "  border: 0;\r\n", 14 },
+        { "  box-shadow: none;\n", 20 },
+        { "}\n", 2 },
         { ".input-group-textarea {\r\n", 25 },
         { "  height: auto;\r\n", 17 },
         { "  min-height: 64px;\r\n", 21 },
@@ -2544,7 +2555,7 @@ static const struct {
         { "  background-color: rgb(250 250 250 / 0.6);\n", 44 },
         { "}\n", 2 },
 };
-static const size_t css_str_style_nova_total_length = 51109;
+static const size_t css_str_style_nova_total_length = 51394;
 static inline void ui_load_css_string_style_nova_chunks(void)
 {
         size_t i;

@@ -182,6 +182,29 @@ static void test_focus_ring(void)
         ui_clear_trash();
 }
 
+static void test_grouped_input_focus(void)
+{
+        ui_widget_t *group = ui_create_widget("input-group");
+        ui_widget_t *input = ui_create_widget("textinput");
+
+        ui_widget_add_class(input, "input-group-input");
+        ui_widget_append(group, input);
+        ui_widget_append(ui_root(), group);
+        ui_widget_add_status(input, "focus");
+        ui_theme_set_accent("green");
+        ui_update();
+        ctest_equal_bool(
+            "grouped input should not draw its own ring",
+            input->computed_style.type_bits.box_shadow == CSS_BOX_SHADOW_NONE,
+            true);
+        ctest_equal_float("grouped input should not draw its own border",
+                          input->computed_style.border_top_width, 0.0f);
+
+        ui_theme_set_accent(NULL);
+        ui_widget_destroy(group);
+        ui_clear_trash();
+}
+
 static void test_fill_primary(void)
 {
         ui_widget_t *fill = ui_create_widget(NULL);
@@ -210,6 +233,7 @@ void test_theme_accent(void)
         ctest_describe("accent swatch", test_swatch_dark);
         ctest_describe("accent switch", test_accent_switch);
         ctest_describe("accent focus ring", test_focus_ring);
+        ctest_describe("accent grouped input", test_grouped_input_focus);
         ctest_describe("accent fill", test_fill_primary);
 
         lcui_destroy();

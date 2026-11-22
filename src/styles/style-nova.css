@@ -1079,6 +1079,21 @@ input-group-addon:align-block-end {
   box-shadow: none;
 }
 
+/* The generic focus ring matches the inner control too, and the accent
+ * override is more specific than the reset above. Strip it here so grouped
+ * inputs only show the ring owned by input-group. */
+input-group textinput.input-group-input:focus,
+input-group textinput.input-group-textarea:focus {
+  border: 0;
+  box-shadow: none;
+}
+
+.dark input-group textinput.input-group-input:focus,
+.dark input-group textinput.input-group-textarea:focus {
+  border: 0;
+  box-shadow: none;
+}
+
 .input-group-textarea {
   height: auto;
   min-height: 64px;
