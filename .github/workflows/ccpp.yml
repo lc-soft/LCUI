@@ -177,6 +177,15 @@ jobs:
       - name: Install examples
         run: xmake install -o dist/lcui-examples -g lcui-examples
 
+      - name: Build examples archive
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $plat = if ($env:RUNNER_OS -eq 'Windows') { 'windows' } else { 'linux' }
+          $version = $env:GITHUB_REF -replace '^refs/tags/v', ''
+          Compress-Archive -Path dist/lcui-examples/* -DestinationPath "dist/lcui-$version-$plat-x64-examples.zip"
+          Get-Item "dist/lcui-$version-$plat-x64-examples.zip" | Select-Object Name, Length
+
       - uses: actions/upload-artifact@v7
         with:
           name: lcui${{ env.TARGET_MAJOR }}-${{ env.TARGET_VERSION }}-${{ env.TARGET_KIND }} (${{ runner.os }})
