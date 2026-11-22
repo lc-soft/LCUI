@@ -88,7 +88,7 @@ export default function InputGroupButtonDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">16</Text>
-                  <Text className="code-line">{`        ui_textinput_set_placeholder(input, [color=#0a3069]"https://x.com/shadcn"[/color]);`}</Text>
+                  <Text className="code-line">{`        ui_textinput_set_placeholder(input, [color=#0a3069]"https://example.com/username"[/color]);`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">17</Text>
@@ -306,7 +306,7 @@ export default function InputGroupButtonDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">16</Text>
-                  <Text className="code-line">{`        ui_textinput_set_placeholder(input, [color=#a5d6ff]"https://x.com/shadcn"[/color]);`}</Text>
+                  <Text className="code-line">{`        ui_textinput_set_placeholder(input, [color=#a5d6ff]"https://example.com/username"[/color]);`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">17</Text>
@@ -497,7 +497,7 @@ export default function InputGroupButtonDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`[color=#116329]                   [color=#0550ae]placeholder[/color]=[color=#0a3069]"https://x.com/shadcn"[/color] />[/color]`}</Text>
+                  <Text className="code-line">{`[color=#116329]                   [color=#0550ae]placeholder[/color]=[color=#0a3069]"https://example.com/username"[/color] />[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">8</Text>
@@ -635,7 +635,7 @@ export default function InputGroupButtonDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`[color=#7ee787]                   [color=#79c0ff]placeholder[/color]=[color=#a5d6ff]"https://x.com/shadcn"[/color] />[/color]`}</Text>
+                  <Text className="code-line">{`[color=#7ee787]                   [color=#79c0ff]placeholder[/color]=[color=#a5d6ff]"https://example.com/username"[/color] />[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">8</Text>
@@ -871,7 +871,7 @@ export default function InputGroupButtonDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">14</Text>
-                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]InputGroupInput[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"https://x.com/shadcn"[/color] />[/color]`}</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]InputGroupInput[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"https://example.com/username"[/color] />[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">15</Text>
@@ -1021,7 +1021,7 @@ export default function InputGroupButtonDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">14</Text>
-                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]InputGroupInput[/color] [color=#79c0ff]placeholder[/color]=[color=#a5d6ff]"https://x.com/shadcn"[/color] />[/color]`}</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]InputGroupInput[/color] [color=#79c0ff]placeholder[/color]=[color=#a5d6ff]"https://example.com/username"[/color] />[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">15</Text>

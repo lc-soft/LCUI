@@ -360,7 +360,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">84</Text>
-                  <Text className="code-line">{`            create_profile_button([color=#0a3069]"person-circle"[/color], [color=#0a3069]"shadcn"[/color], [color=#0a3069]"m@example.com"[/color],`}</Text>
+                  <Text className="code-line">{`            create_profile_button([color=#0a3069]"person-circle"[/color], [color=#0a3069]"username"[/color], [color=#0a3069]"m@example.com"[/color],`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">85</Text>
@@ -404,7 +404,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">95</Text>
-                  <Text className="code-line">{`        ui_text_set_content(label, [color=#0a3069]"shadcn"[/color]);`}</Text>
+                  <Text className="code-line">{`        ui_text_set_content(label, [color=#0a3069]"username"[/color]);`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">96</Text>
@@ -768,7 +768,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">186</Text>
-                  <Text className="code-line">{`        ui_widget_add_class(menu, [color=#0a3069]"sidebar-project-menu"[/color]);`}</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(menu, [color=#0a3069]"sidebar-menu-action-menu"[/color]);`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">187</Text>
@@ -1602,7 +1602,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">84</Text>
-                  <Text className="code-line">{`            create_profile_button([color=#a5d6ff]"person-circle"[/color], [color=#a5d6ff]"shadcn"[/color], [color=#a5d6ff]"m@example.com"[/color],`}</Text>
+                  <Text className="code-line">{`            create_profile_button([color=#a5d6ff]"person-circle"[/color], [color=#a5d6ff]"username"[/color], [color=#a5d6ff]"m@example.com"[/color],`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">85</Text>
@@ -1646,7 +1646,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">95</Text>
-                  <Text className="code-line">{`        ui_text_set_content(label, [color=#a5d6ff]"shadcn"[/color]);`}</Text>
+                  <Text className="code-line">{`        ui_text_set_content(label, [color=#a5d6ff]"username"[/color]);`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">96</Text>
@@ -2010,7 +2010,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">186</Text>
-                  <Text className="code-line">{`        ui_widget_add_class(menu, [color=#a5d6ff]"sidebar-project-menu"[/color]);`}</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(menu, [color=#a5d6ff]"sidebar-menu-action-menu"[/color]);`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">187</Text>
@@ -3265,7 +3265,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">187</Text>
-                  <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]dropdown-menu[/color] [color=#0550ae]class[/color]=[color=#0a3069]"sidebar-project-menu"[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]dropdown-menu[/color] [color=#0550ae]class[/color]=[color=#0a3069]"sidebar-menu-action-menu"[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">188</Text>
@@ -3369,7 +3369,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">213</Text>
-                  <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]dropdown-menu[/color] [color=#0550ae]class[/color]=[color=#0a3069]"sidebar-project-menu"[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]dropdown-menu[/color] [color=#0550ae]class[/color]=[color=#0a3069]"sidebar-menu-action-menu"[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">214</Text>
@@ -3473,7 +3473,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">239</Text>
-                  <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]dropdown-menu[/color] [color=#0550ae]class[/color]=[color=#0a3069]"sidebar-project-menu"[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]dropdown-menu[/color] [color=#0550ae]class[/color]=[color=#0a3069]"sidebar-menu-action-menu"[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">240</Text>
@@ -3625,7 +3625,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">277</Text>
-                  <Text className="code-line">{`                [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]class[/color]=[color=#0a3069]"sidebar-menu-button sidebar-user"[/color] [color=#0550ae]data-sidebar-tooltip[/color]=[color=#0a3069]"shadcn"[/color] [color=#0550ae]data-dropdown-menu-trigger[/color]=[color=#0a3069]"true"[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]class[/color]=[color=#0a3069]"sidebar-menu-button sidebar-user"[/color] [color=#0550ae]data-sidebar-tooltip[/color]=[color=#0a3069]"username"[/color] [color=#0550ae]data-dropdown-menu-trigger[/color]=[color=#0a3069]"true"[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">278</Text>
@@ -3637,7 +3637,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">280</Text>
-                  <Text className="code-line">{`                    [color=#116329]<[color=#0550ae]text[/color] [color=#0550ae]class[/color]=[color=#0a3069]"sidebar-menu-name"[/color]>[/color]shadcn[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                    [color=#116329]<[color=#0550ae]text[/color] [color=#0550ae]class[/color]=[color=#0a3069]"sidebar-menu-name"[/color]>[/color]username[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">281</Text>
@@ -3661,7 +3661,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">286</Text>
-                  <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]dropdown-menu-label[/color]>[/color]shadcn[color=#116329]</[color=#0550ae]dropdown-menu-label[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]dropdown-menu-label[/color]>[/color]username[color=#116329]</[color=#0550ae]dropdown-menu-label[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">287</Text>
@@ -4559,7 +4559,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">187</Text>
-                  <Text className="code-line">{`                  [color=#7ee787]<[color=#79c0ff]dropdown-menu[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"sidebar-project-menu"[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                  [color=#7ee787]<[color=#79c0ff]dropdown-menu[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"sidebar-menu-action-menu"[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">188</Text>
@@ -4663,7 +4663,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">213</Text>
-                  <Text className="code-line">{`                  [color=#7ee787]<[color=#79c0ff]dropdown-menu[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"sidebar-project-menu"[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                  [color=#7ee787]<[color=#79c0ff]dropdown-menu[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"sidebar-menu-action-menu"[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">214</Text>
@@ -4767,7 +4767,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">239</Text>
-                  <Text className="code-line">{`                  [color=#7ee787]<[color=#79c0ff]dropdown-menu[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"sidebar-project-menu"[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                  [color=#7ee787]<[color=#79c0ff]dropdown-menu[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"sidebar-menu-action-menu"[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">240</Text>
@@ -4919,7 +4919,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">277</Text>
-                  <Text className="code-line">{`                [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"sidebar-menu-button sidebar-user"[/color] [color=#79c0ff]data-sidebar-tooltip[/color]=[color=#a5d6ff]"shadcn"[/color] [color=#79c0ff]data-dropdown-menu-trigger[/color]=[color=#a5d6ff]"true"[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"sidebar-menu-button sidebar-user"[/color] [color=#79c0ff]data-sidebar-tooltip[/color]=[color=#a5d6ff]"username"[/color] [color=#79c0ff]data-dropdown-menu-trigger[/color]=[color=#a5d6ff]"true"[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">278</Text>
@@ -4931,7 +4931,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">280</Text>
-                  <Text className="code-line">{`                    [color=#7ee787]<[color=#79c0ff]text[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"sidebar-menu-name"[/color]>[/color]shadcn[color=#7ee787]</[color=#79c0ff]text[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                    [color=#7ee787]<[color=#79c0ff]text[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"sidebar-menu-name"[/color]>[/color]username[color=#7ee787]</[color=#79c0ff]text[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">281</Text>
@@ -4955,7 +4955,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">286</Text>
-                  <Text className="code-line">{`                  [color=#7ee787]<[color=#79c0ff]dropdown-menu-label[/color]>[/color]shadcn[color=#7ee787]</[color=#79c0ff]dropdown-menu-label[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                  [color=#7ee787]<[color=#79c0ff]dropdown-menu-label[/color]>[/color]username[color=#7ee787]</[color=#79c0ff]dropdown-menu-label[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">287</Text>
@@ -5859,7 +5859,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">171</Text>
-                  <Text className="code-line">{`                        [color=#116329]<[color=#0550ae]DropdownMenu[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                        [color=#116329]<[color=#0550ae]DropdownMenu[/color] [color=#0550ae]className[/color]=[color=#0a3069]"sidebar-menu-action-menu"[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">172</Text>
@@ -6035,7 +6035,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">215</Text>
-                  <Text className="code-line">{`[color=#116329]                    [color=#0550ae]data-sidebar-tooltip[/color]=[color=#0a3069]"shadcn"[/color][/color]`}</Text>
+                  <Text className="code-line">{`[color=#116329]                    [color=#0550ae]data-sidebar-tooltip[/color]=[color=#0a3069]"username"[/color][/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">216</Text>
@@ -6059,7 +6059,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">221</Text>
-                  <Text className="code-line">{`                      [color=#116329]<[color=#0550ae]Text[/color] [color=#0550ae]className[/color]=[color=#0a3069]"text-sm font-medium"[/color]>[/color]shadcn[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                      [color=#116329]<[color=#0550ae]Text[/color] [color=#0550ae]className[/color]=[color=#0a3069]"text-sm font-medium"[/color]>[/color]username[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">222</Text>
@@ -6123,7 +6123,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">237</Text>
-                  <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]DropdownMenuLabel[/color]>[/color]shadcn[color=#116329]</[color=#0550ae]DropdownMenuLabel[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]DropdownMenuLabel[/color]>[/color]username[color=#116329]</[color=#0550ae]DropdownMenuLabel[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">238</Text>
@@ -6965,7 +6965,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">171</Text>
-                  <Text className="code-line">{`                        [color=#7ee787]<[color=#79c0ff]DropdownMenu[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                        [color=#7ee787]<[color=#79c0ff]DropdownMenu[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"sidebar-menu-action-menu"[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">172</Text>
@@ -7141,7 +7141,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">215</Text>
-                  <Text className="code-line">{`[color=#7ee787]                    [color=#79c0ff]data-sidebar-tooltip[/color]=[color=#a5d6ff]"shadcn"[/color][/color]`}</Text>
+                  <Text className="code-line">{`[color=#7ee787]                    [color=#79c0ff]data-sidebar-tooltip[/color]=[color=#a5d6ff]"username"[/color][/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">216</Text>
@@ -7165,7 +7165,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">221</Text>
-                  <Text className="code-line">{`                      [color=#7ee787]<[color=#79c0ff]Text[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"text-sm font-medium"[/color]>[/color]shadcn[color=#7ee787]</[color=#79c0ff]Text[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                      [color=#7ee787]<[color=#79c0ff]Text[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"text-sm font-medium"[/color]>[/color]username[color=#7ee787]</[color=#79c0ff]Text[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">222</Text>
@@ -7229,7 +7229,7 @@ export default function SidebarBasicDemo() {
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">237</Text>
-                  <Text className="code-line">{`                  [color=#7ee787]<[color=#79c0ff]DropdownMenuLabel[/color]>[/color]shadcn[color=#7ee787]</[color=#79c0ff]DropdownMenuLabel[/color]>[/color]`}</Text>
+                  <Text className="code-line">{`                  [color=#7ee787]<[color=#79c0ff]DropdownMenuLabel[/color]>[/color]username[color=#7ee787]</[color=#79c0ff]DropdownMenuLabel[/color]>[/color]`}</Text>
                 </Widget>
                 <Widget className="code-line-row">
                   <Text className="code-line-number">238</Text>
