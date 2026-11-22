@@ -274,16 +274,16 @@
           <sidebar-menu>
             <sidebar-menu-item>
               <dropdown-menu class="sidebar-user-menu">
-                <button class="sidebar-menu-button sidebar-user" data-sidebar-tooltip="shadcn" data-dropdown-menu-trigger="true">
+                <button class="sidebar-menu-button sidebar-user" data-sidebar-tooltip="username" data-dropdown-menu-trigger="true">
                   <div class="sidebar-avatar"><icon name="person-circle" /></div>
                   <div class="sidebar-menu-text">
-                    <text class="sidebar-menu-name">shadcn</text>
+                    <text class="sidebar-menu-name">username</text>
                     <text class="sidebar-menu-meta">m@example.com</text>
                   </div>
                   <icon class="sidebar-menu-chevron" name="chevron-up-down" />
                 </button>
                 <dropdown-menu-content class="sidebar-user-menu-content" side="right" align="end">
-                  <dropdown-menu-label>shadcn</dropdown-menu-label>
+                  <dropdown-menu-label>username</dropdown-menu-label>
                   <text class="sidebar-user-menu-email">m@example.com</text>
                   <dropdown-menu-separator />
                   <dropdown-menu-item>

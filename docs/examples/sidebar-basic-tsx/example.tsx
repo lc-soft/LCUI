@@ -212,13 +212,13 @@ export default function App() {
                 <DropdownMenuTrigger>
                   <SidebarMenuButton
                     className="sidebar-user h-11 p-2"
-                    data-sidebar-tooltip="shadcn"
+                    data-sidebar-tooltip="username"
                   >
                     <Widget className="sidebar-avatar">
                       <Icon name="person-circle" />
                     </Widget>
                     <Widget className="flex flex-1 flex-col gap-0.5 text-left">
-                      <Text className="text-sm font-medium">shadcn</Text>
+                      <Text className="text-sm font-medium">username</Text>
                       <Text className="text-xs text-muted-foreground">
                         m@example.com
                       </Text>
@@ -234,7 +234,7 @@ export default function App() {
                   side="right"
                   align="end"
                 >
-                  <DropdownMenuLabel>shadcn</DropdownMenuLabel>
+                  <DropdownMenuLabel>username</DropdownMenuLabel>
                   <Text className="px-2 pb-1.5 text-xs text-muted-foreground">
                     m@example.com
                   </Text>

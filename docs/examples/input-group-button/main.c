@@ -13,7 +13,7 @@ void input_group_button_init(ui_widget_t *parent)
 
         group = ui_create_input_group();
         input = ui_create_input_group_input();
-        ui_textinput_set_placeholder(input, "https://x.com/shadcn");
+        ui_textinput_set_placeholder(input, "https://example.com/username");
         addon = ui_create_input_group_addon();
         ui_input_group_addon_set_align(addon, UI_INPUT_GROUP_ADDON_INLINE_END);
         button = ui_create_input_group_button();

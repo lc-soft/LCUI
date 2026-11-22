@@ -11,7 +11,7 @@ export default function Example() {
   return (
     <Widget className="flex w-full max-w-sm flex-col gap-6 clip-safe">
       <InputGroup>
-        <InputGroupInput placeholder="https://x.com/shadcn" />
+        <InputGroupInput placeholder="https://example.com/username" />
         <InputGroupAddon align="inline-end">
           <InputGroupButton size="icon-xs">
             <Icon name="copy" />

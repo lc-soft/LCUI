@@ -81,7 +81,7 @@ static ui_widget_t *create_user_menu(void)
 {
         ui_widget_t *menu = ui_create_dropdown_menu();
         ui_widget_t *button =
-            create_profile_button("person-circle", "shadcn", "m@example.com",
+            create_profile_button("person-circle", "username", "m@example.com",
                                   "sidebar-user", "sidebar-avatar");
         ui_widget_t *content = ui_create_dropdown_menu_content();
         ui_widget_t *label = ui_create_dropdown_menu_label();
@@ -92,7 +92,7 @@ static ui_widget_t *create_user_menu(void)
         ui_widget_set_attr(button, "data-dropdown-menu-trigger", "true");
         ui_widget_set_attr(content, "side", "right");
         ui_widget_set_attr(content, "align", "end");
-        ui_text_set_content(label, "shadcn");
+        ui_text_set_content(label, "username");
         ui_widget_append(content, label);
         ui_text_set_content(email, "m@example.com");
         ui_widget_add_class(email, "sidebar-user-menu-email");

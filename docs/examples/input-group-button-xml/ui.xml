@@ -4,7 +4,7 @@
     <widget class="input-group-button-demo clip-safe">
       <input-group>
         <textinput class="input-group-input input-group-control"
-                   placeholder="https://x.com/shadcn" />
+                   placeholder="https://example.com/username" />
         <input-group-addon align="inline-end">
           <button variant="ghost" size="icon-xs" class="input-group-button">
             <icon name="copy" />
