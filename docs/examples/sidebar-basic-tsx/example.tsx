@@ -168,7 +168,7 @@ export default function App() {
                             {project.title}
                           </Text>
                         </SidebarMenuButton>
-                        <DropdownMenu>
+                        <DropdownMenu className="sidebar-menu-action-menu">
                           <DropdownMenuTrigger className="sidebar-menu-action-trigger">
                             <SidebarMenuAction>
                               <Icon name="more-horizontal" />

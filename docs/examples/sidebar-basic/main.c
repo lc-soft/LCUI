@@ -183,7 +183,7 @@ static ui_widget_t *create_project_item(const char *icon_name,
         ui_widget_append(button, icon);
         ui_widget_append(button, label);
 
-        ui_widget_add_class(menu, "sidebar-project-menu");
+        ui_widget_add_class(menu, "sidebar-menu-action-menu");
         ui_widget_add_class(action, "sidebar-menu-action-trigger");
         ui_widget_set_attr(action, "data-dropdown-menu-trigger", "true");
         ui_widget_append(action, more);

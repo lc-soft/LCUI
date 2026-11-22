@@ -50,6 +50,7 @@ sidebar {\
   position: relative;\
   flex-shrink: 0;\
   width: 240px;\
+  height: 100%;\
   box-sizing: border-box;\
   background: #ffffff;\
   border-right: 1px solid #e5e5e5;\
@@ -95,6 +96,7 @@ sidebar-provider:collapsed sidebar:icon {\
 sidebar-header, sidebar-footer {\
   display: flex;\
   flex-direction: column;\
+  flex-shrink: 0;\
   padding: 8px;\
 }\
 sidebar-content {\
@@ -143,7 +145,8 @@ sidebar-menu-item {\
   display: block;\
   position: relative;\
 }\
-sidebar-menu-item dropdown-menu {\
+/* Only action menus overlay the item; regular menus (team/user) stay in flow. */\
+sidebar-menu-item dropdown-menu.sidebar-menu-action-menu {\
   position: absolute;\
   top: 5px;\
   right: 4px;\

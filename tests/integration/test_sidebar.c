@@ -596,6 +596,7 @@ static void test_project_action_layout(void)
         int action_y;
 
         ui_widget_add_class(button, "sidebar-menu-button");
+        ui_widget_add_class(menu, "sidebar-menu-action-menu");
         ui_widget_add_class(action, "sidebar-menu-action-trigger");
         ui_widget_set_attr(action, "data-dropdown-menu-trigger", "true");
         ui_widget_append(action, ui_create_fluent_icon("more-horizontal"));

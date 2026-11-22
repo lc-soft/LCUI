@@ -184,7 +184,7 @@
                     <icon name="code-block" />
                     <text class="sidebar-menu-label">Design Engineering</text>
                   </button>
-                  <dropdown-menu class="sidebar-project-menu">
+                  <dropdown-menu class="sidebar-menu-action-menu">
                     <sidebar-menu-action class="sidebar-menu-action-trigger" data-dropdown-menu-trigger="true">
                       <icon name="more-horizontal" />
                     </sidebar-menu-action>
@@ -210,7 +210,7 @@
                     <icon name="book-open" />
                     <text class="sidebar-menu-label">Sales &amp; Marketing</text>
                   </button>
-                  <dropdown-menu class="sidebar-project-menu">
+                  <dropdown-menu class="sidebar-menu-action-menu">
                     <sidebar-menu-action class="sidebar-menu-action-trigger" data-dropdown-menu-trigger="true">
                       <icon name="more-horizontal" />
                     </sidebar-menu-action>
@@ -236,7 +236,7 @@
                     <icon name="document-text" />
                     <text class="sidebar-menu-label">Travel</text>
                   </button>
-                  <dropdown-menu class="sidebar-project-menu">
+                  <dropdown-menu class="sidebar-menu-action-menu">
                     <sidebar-menu-action class="sidebar-menu-action-trigger" data-dropdown-menu-trigger="true">
                       <icon name="more-horizontal" />
                     </sidebar-menu-action>
