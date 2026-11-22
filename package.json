@@ -21,7 +21,8 @@
     "doc-viewer:stars": "node scripts/fetch-repo-stars.js",
     "doc-viewer:compile-docs": "npm run doc-viewer:stars && cd examples/doc-viewer && npm run compile",
     "doc-viewer:compile-tsx": "npm run doc-viewer:stars && cd examples/doc-viewer && lcui build --force --skip-xmake",
-    "prepare": "husky"
+    "prepare": "husky",
+    "version": "node scripts/release-version.mjs"
   },
   "lint-staged": {
     "**/*.{c,h}": [
@@ -31,6 +32,8 @@
   "devDependencies": {
     "@thedutchcoder/postcss-rem-to-px": "^0.0.2",
     "clang-format-node": "^3.0.6",
+    "conventional-changelog": "^8.1.3",
+    "conventional-changelog-angular": "^9.4.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.10",
     "postcss": "^8.5.28",

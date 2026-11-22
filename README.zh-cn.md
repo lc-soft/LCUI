@@ -167,7 +167,7 @@ xmake run my-app
 - [在线文档](https://lcui-dev.github.io/docs/next/guides/base/)
 - [内置示例](examples/)：`hello`、`todolist`、`fabric`、`doc-viewer`
 - 教程：[图像查看器](https://lcui-dev.github.io/docs/tutorials/kantu)、[待办清单](https://lcui-dev.github.io/docs/tutorials/todolist)、[渲染布料动画](https://lcui-dev.github.io/docs/tutorials/render-fabric)
-- [意见征集稿（RFC）](https://lcui-dev.github.io/docs/next/rfcs/) / [更新日志](CHANGELOG.zh-cn.md) / [贡献指南](.github/CONTRIBUTING.md)
+- [意见征集稿（RFC）](https://lcui-dev.github.io/docs/next/rfcs/) / [更新日志](https://github.com/lc-soft/LCUI/releases) / [贡献指南](.github/CONTRIBUTING.md)
 
 ## 从源码构建与测试
 

@@ -208,20 +208,9 @@ jobs:
       - name: Set release version
         run: python ./.github/scripts/get_release_version.py
 
-      - name: Create release notes
-        run: python ./.github/scripts/get_release_notes.py
-
-      - name: Read package.json
-        id: release_notes
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: RELEASE_NOTES.md
-          trim: false
-
       - name: Create release
         uses: svenstaro/upload-release-action@v2
         with:
-          body: ${{ steps.release_notes.outputs.content }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           release_name: LCUI ${{ env.REL_VERSION }}
           tag: ${{ github.ref }}

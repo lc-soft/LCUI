@@ -54,6 +54,16 @@ function parseVersion(version) {
         };
 }
 
+/* Keep the working-tree line endings stable so --check does not report every
+ * CRLF checkout as out of sync. */
+function normalizeEol(text) {
+        return text.replace(/\r\n/g, "\n");
+}
+
+function restoreEol(text, eol) {
+        return eol === "\r\n" ? text.replace(/\n/g, "\r\n") : text;
+}
+
 function syncXmake(text, version) {
         const lines = text.split("\n");
         const existing = lines.findIndex((line) =>
@@ -104,7 +114,11 @@ function main() {
                 }
                 const path = join(root, file);
                 const before = readFileSync(path, "utf8");
-                const after = syncXmake(before, version);
+                const eol = before.includes("\r\n") ? "\r\n" : "\n";
+                const after = restoreEol(
+                        syncXmake(normalizeEol(before), version),
+                        eol
+                );
                 if (before !== after) {
                         changed++;
                         problems.push(
@@ -120,7 +134,11 @@ function main() {
                 const version = versions[pkg];
                 const path = join(root, file);
                 const before = readFileSync(path, "utf8");
-                const after = syncHeader(before, macro, version);
+                const eol = before.includes("\r\n") ? "\r\n" : "\n";
+                const after = restoreEol(
+                        syncHeader(normalizeEol(before), macro, version),
+                        eol
+                );
                 if (before !== after) {
                         changed++;
                         problems.push(`${file}: expected ${macro} ${version}`);
