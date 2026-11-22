@@ -1,5 +1,5 @@
 set_project("lcui")
-set_version("3.0.0-alpha.0")
+set_version("3.0.0-alpha.1")
 set_languages("c11")
 set_warnings("all", "error")
 set_policy("package.requires_lock", true)
