@@ -14,12 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '24'
 
@@ -46,7 +46,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: "Builds binaries on ${{ matrix.os }}"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -73,7 +73,7 @@ jobs:
       - name: Build
         run: xmake
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
 
@@ -146,7 +146,7 @@ jobs:
 
       - name: Upload reports to Codecov
         if: runner.os == 'Linux'
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
@@ -177,14 +177,14 @@ jobs:
       - name: Install examples
         run: xmake install -o dist/lcui-examples -g lcui-examples
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: lcui${{ env.TARGET_MAJOR }}-${{ env.TARGET_VERSION }}-${{ env.TARGET_KIND }} (${{ runner.os }})
           path: |
             dist/lcui-package
             dist/lcui-*.zip
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: lcui${{ env.TARGET_MAJOR }}-examples (${{ runner.os }})
           path: |
@@ -198,10 +198,10 @@ jobs:
       ARTIFACT_DIR: ./release
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: ${{ env.ARTIFACT_DIR }}
 
