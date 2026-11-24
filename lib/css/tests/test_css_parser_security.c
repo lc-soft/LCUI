@@ -72,6 +72,21 @@ static void check_class_selector_over_limit(void)
         ctest_equal_int("should survive overlong class selector", count, 1);
 }
 
+static void check_duplicate_class_selector(void)
+{
+        char css[560];
+        int i;
+        int count;
+
+        for (i = 0; i < 250; ++i) {
+                css[i * 2] = '.';
+                css[i * 2 + 1] = 'a';
+        }
+        strcpy(css + 500, "{display:block;}");
+        count = parse_chunked_css("parser-security/duplicate", css);
+        ctest_equal_int("should reject duplicate class selector", count, 0);
+}
+
 void test_css_parser_security(void)
 {
         css_init();
@@ -81,4 +96,6 @@ void test_css_parser_security(void)
         ctest_describe("selector name at limit", check_selector_name_at_limit);
         ctest_describe("class selector over limit",
                        check_class_selector_over_limit);
+        ctest_describe("duplicate class selector",
+                       check_duplicate_class_selector);
 }
