@@ -91,13 +91,20 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                 if (!sfinder->node->id) {
                         return 0;
                 }
+                if (len + 1 + strlen(sfinder->node->id) >= avail) {
+                        logger_debug("[css] selector name is too long, "
+                                     "skipping id\n");
+                        return 0;
+                }
                 fullname[len++] = '#';
-                fullname[len] = 0;
-                snprintf(fullname + len, avail - len, "%s", sfinder->node->id);
+                strcpy(fullname + len, sfinder->node->id);
                 list_append(list, y_strdup(fullname));
                 break;
         case LEVEL_CLASS:
                 if (!sfinder->node->classes) {
+                        return 0;
+                }
+                if (len + 1 >= avail) {
                         return 0;
                 }
                 /* 按类选择器生成选择器全名
@@ -109,10 +116,14 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                  */
                 fullname[len++] = '.';
                 for (i = 0; sfinder->node->classes[i]; ++i) {
+                        if (len + strlen(sfinder->node->classes[i]) >= avail) {
+                                logger_debug("[css] selector name is too long, "
+                                             "skipping class\n");
+                                continue;
+                        }
                         sfinder->level += 1;
                         sfinder->class_i = i;
-                        snprintf(fullname + len, avail - len, "%s",
-                                 sfinder->node->classes[i]);
+                        strcpy(fullname + len, sfinder->node->classes[i]);
                         list_append(list, y_strdup(fullname));
                         /* 将当前选择器名与其它层级的选择器名组合 */
                         while (sfinder->level < LEVEL_TOTAL_NUM) {
@@ -130,6 +141,9 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                 if (!sfinder->node->classes) {
                         return 0;
                 }
+                if (len + 1 >= avail) {
+                        return 0;
+                }
                 /* 按类选择器生成选择器全名，结果类似于这样：
                  * text#test-text.a.b
                  * text#test-text.a.c
@@ -139,6 +153,11 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                 fullname[len++] = '.';
                 for (i = 0; sfinder->node->classes[i]; ++i) {
                         if (i <= sfinder->class_i) {
+                                continue;
+                        }
+                        if (len + strlen(sfinder->node->classes[i]) >= avail) {
+                                logger_debug("[css] selector name is too long, "
+                                             "skipping class combination\n");
                                 continue;
                         }
                         strcpy(fullname + len, sfinder->node->classes[i]);
@@ -161,6 +180,9 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                 if (!sfinder->node->status) {
                         return 0;
                 }
+                if (len + 1 >= avail) {
+                        return 0;
+                }
                 fullname[len++] = ':';
                 sfinder->level = LEVEL_STATUS_2;
                 /**
@@ -176,6 +198,11 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                  * text#main-btn-text:hover
                  */
                 for (i = 0; sfinder->node->status[i]; ++i) {
+                        if (len + strlen(sfinder->node->status[i]) >= avail) {
+                                logger_debug("[css] selector name is too long, "
+                                             "skipping status\n");
+                                continue;
+                        }
                         sfinder->status_i = i;
                         strcpy(fullname + len, sfinder->node->status[i]);
                         list_append(list, y_strdup(fullname));
@@ -197,6 +224,12 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                 for (i = 0; sfinder->node->status[i]; ++i) {
                         if (i <= sfinder->status_i) {
                                 continue;
+                        }
+                        if (len + 1 + strlen(sfinder->node->status[i]) >=
+                            avail) {
+                                logger_debug("[css] selector name is too long, "
+                                             "skipping status combination\n");
+                                break;
                         }
                         fullname[len] = ':';
                         strcpy(fullname + len + 1, sfinder->node->status[i]);
@@ -465,6 +498,12 @@ css_selector_t *css_selector_create(const char *selector)
                 if (!name_valid) {
                         type = 0;
                         name_valid = true;
+                }
+                if (name_index >= MAX_NAME_LEN - 1) {
+                        logger_warning("%s: selector name is too long.\n",
+                                       selector);
+                        css_selector_destroy(s);
+                        return NULL;
                 }
                 name[name_index++] = *p;
                 name[name_index] = 0;

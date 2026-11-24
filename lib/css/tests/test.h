@@ -20,3 +20,5 @@ void test_css_text_decoration(void);
 void test_css_inheritance(void);
 
 void test_css_cursor(void);
+
+void test_css_parser_security(void);

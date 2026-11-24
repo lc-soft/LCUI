@@ -267,7 +267,7 @@ void css_parser_commit(css_parser_t *parser)
 
         parser->buffer[parser->pos] = 0;
         for (i = 0, start = -1; i < parser->pos && start == -1; ++i) {
-                switch (parser->buffer[parser->pos]) {
+                switch (parser->buffer[i]) {
                 CASE_WHITE_SPACE:
                         break;
                 default:
@@ -276,10 +276,12 @@ void css_parser_commit(css_parser_t *parser)
                 }
         }
         /* trim left */
-        for (i = 0; i < start; ++i) {
-                parser->buffer[i] = parser->buffer[start + i];
+        if (start > 0) {
+                for (i = 0; i < parser->pos - start; ++i) {
+                        parser->buffer[i] = parser->buffer[start + i];
+                }
+                parser->pos -= start;
         }
-        parser->pos -= start;
         parser->buffer[parser->pos] = 0;
         /* trim right */
         for (i = parser->pos; i > 0; --i) {
@@ -302,6 +304,13 @@ size_t css_parser_parse(css_parser_t *parser, const char *str)
 
         parser->cur = str;
         while (*parser->cur && size < parser->buffer_size) {
+                if (parser->pos >= parser->buffer_size - 1) {
+                        logger_debug("[css-parser] token buffer is full, "
+                                     "resetting parser state\n");
+                        parser->pos = 0;
+                        parser->target = CSS_PARSER_TARGET_NONE;
+                        break;
+                }
                 switch (parser->target) {
                 case CSS_PARSER_TARGET_NONE:
                         css_parser_parse_target(parser);
