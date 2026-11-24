@@ -1,3 +1,11 @@
+# [3.0.0-alpha.2](https://github.com/lc-soft/LCUI/compare/v3.0.0-alpha.1...v3.0.0-alpha.2) (2026-11-24)
+
+### Bug Fixes
+
+* **css:** oversized selectors should not overflow parser buffers ([ec5cd50](https://github.com/lc-soft/LCUI/commit/ec5cd503fa37a5dc292d539dcbfdcdfcd60f2840))
+* **ui-xml:** resource node should reject missing type attribute ([d57350e](https://github.com/lc-soft/LCUI/commit/d57350e286de9b5ada903db52509e7360316a288))
+* **yutil:** strlist_sorted_add should not leave a dangling list ([08778d8](https://github.com/lc-soft/LCUI/commit/08778d8bf6bfdba8c394a35d2a84b83d60132a4e))
+
 # [3.0.0-alpha.1](https://github.com/lc-soft/LCUI/compare/v3.0.0-alpha.0...v3.0.0-alpha.1) (2026-11-22)
 
 ### Bug Fixes
