@@ -12,8 +12,11 @@
 #include <ctest.h>
 
 extern void test_ui_xml_parser(void);
+extern void test_ui_xml_resource_node(void);
 
 static const ctest_suite_t suites[] = { { "ui-xml/parser", test_ui_xml_parser },
+                                        { "ui-xml/resource node",
+                                          test_ui_xml_resource_node },
                                         { NULL, NULL } };
 
 CTEST_MAIN(suites)

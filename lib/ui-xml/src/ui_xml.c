@@ -102,11 +102,11 @@ static int ui_builder_parse_resource_node(xml_parser_t *parser, xmlNodePtr node)
                 }
                 prop = prop->next;
         }
-        if (!type && !src) {
-                return PB_WARNING;
+        if (!type) {
+                EXIT(PB_WARNING);
         }
         if (strstr(type, "application/font-")) {
-                if (pd_font_load_file(src) < 1) {
+                if (!src || pd_font_load_file(src) < 1) {
                         EXIT(PB_WARNING);
                 }
         } else if (strcmp(type, "text/css") == 0) {
