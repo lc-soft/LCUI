@@ -13,7 +13,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SCOPES = readdirSync(join(root, "lib"), { withFileTypes: true })
         .filter((entry) => entry.isDirectory())
         .map((entry) => entry.name)
-        .concat(["styles", "widgets"])
+        .concat(["styles", "widgets", "release"])
         .sort();
 
 const file = process.argv[2];
